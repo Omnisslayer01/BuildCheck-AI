@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
-from .models import BugTicket
+from .models import BugTicket, BusinessEvaluation
 
 
 @csrf_exempt
@@ -66,6 +66,53 @@ def update_bug_status(request):
 
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_business_lens(request):
+    """
+    API endpoint to save business evaluation data.
+    Expects JSON: {"score": 85, "verdict": "Good business potential"}
+    """
+    try:
+        data = json.loads(request.body)
+        score = data.get('score')
+        verdict = data.get('verdict')
+        
+        if score is None or not verdict:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing score or verdict'
+            }, status=400)
+        
+        # Create new BusinessEvaluation object
+        evaluation = BusinessEvaluation.objects.create(
+            score=score,
+            verdict=verdict
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Business evaluation saved successfully',
+            'evaluation': {
+                'id': evaluation.id,
+                'score': evaluation.score,
+                'verdict': evaluation.verdict,
+                'created_at': evaluation.created_at.isoformat()
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
 def dashboard_home(request):
     """Dashboard home view displaying all bug tickets"""
     tickets = BugTicket.objects.all()
@@ -80,11 +127,15 @@ def dashboard_home(request):
     ai_fixes = fixed_tickets
     threats_blocked = 42
     
+    # Fetch latest business evaluation
+    business_lens = BusinessEvaluation.objects.last()
+    
     context = {
         'tickets': tickets,
         'project_readiness': project_readiness,
         'ai_fixes': ai_fixes,
         'threats_blocked': threats_blocked,
+        'business_lens': business_lens,
     }
     
     return render(request, 'dashboard.html', context)

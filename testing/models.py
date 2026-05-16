@@ -24,4 +24,17 @@ class BugTicket(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+
+class BusinessEvaluation(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    score = models.IntegerField()
+    verdict = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Business Evaluation #{self.id}: Score {self.score}"
+    
+    class Meta:
+        ordering = ['-created_at']
+
 # Made with Bob
