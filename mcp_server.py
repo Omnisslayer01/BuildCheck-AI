@@ -39,7 +39,7 @@ def report_to_boss(message: str) -> str:
     try:
         payload = {"source": "IBM Bob", "message": message}
         response = requests.post(
-            "http://localhost:8000/api/report/",
+            "http://localhost:8000/api/update-status/",
             json=payload
         )
         if response.status_code == 200:
