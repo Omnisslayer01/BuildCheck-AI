@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/update-status/', views.update_bug_status, name='update_bug_status'),
     path('api/bug-list-html/', views.bug_list_partial, name='bug_list_partial'),
     path('api/business-lens/', views.api_business_lens, name='api_business_lens'),
+    path('api/business-lens-html/', views.business_lens_partial, name='business_lens_partial'),
 ]
 
 # Made with Bob

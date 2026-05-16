@@ -78,16 +78,40 @@ def api_business_lens(request):
         score = data.get('score')
         verdict = data.get('verdict')
         
-        if score is None or not verdict:
+        # Validate score is present
+        if score is None:
             return JsonResponse({
                 'success': False,
-                'error': 'Missing score or verdict'
+                'error': 'Missing score'
+            }, status=400)
+        
+        # Convert score to int
+        try:
+            score = int(score)
+        except (ValueError, TypeError):
+            return JsonResponse({
+                'success': False,
+                'error': 'Score must be a valid integer'
+            }, status=400)
+        
+        # Reject score below 0 or above 100
+        if score < 0 or score > 100:
+            return JsonResponse({
+                'success': False,
+                'error': 'Score must be between 0 and 100'
+            }, status=400)
+        
+        # Require verdict to be non-empty text
+        if not verdict or not isinstance(verdict, str) or not verdict.strip():
+            return JsonResponse({
+                'success': False,
+                'error': 'Verdict must be non-empty text'
             }, status=400)
         
         # Create new BusinessEvaluation object
         evaluation = BusinessEvaluation.objects.create(
             score=score,
-            verdict=verdict
+            verdict=verdict.strip()
         )
         
         return JsonResponse({
@@ -127,8 +151,8 @@ def dashboard_home(request):
     ai_fixes = fixed_tickets
     threats_blocked = 42
     
-    # Fetch latest business evaluation
-    business_lens = BusinessEvaluation.objects.last()
+    # Fetch latest business evaluation (use order_by to get newest, not oldest)
+    business_lens = BusinessEvaluation.objects.order_by('-created_at').first()
     
     context = {
         'tickets': tickets,
@@ -147,5 +171,24 @@ def bug_list_partial(request):
         'tickets': tickets,
     }
     return render(request, 'bug_rows.html', context)
+
+
+def business_lens_partial(request):
+    """HTMX endpoint for auto-refreshing Business Lens card"""
+    # Fetch latest BusinessEvaluation using order_by to get newest
+    business_lens = BusinessEvaluation.objects.order_by('-created_at').first()
+    
+    # Fallback values if no evaluation exists
+    if not business_lens:
+        business_lens = {
+            'score': 62,
+            'verdict': 'BuildCheck AI has a strong technical demo, but needs clearer customer segmentation, pricing, and enterprise proof points before it is investor-ready.',
+            'created_at': None
+        }
+    
+    context = {
+        'business_lens': business_lens,
+    }
+    return render(request, 'business_lens_card.html', context)
 
 # Made with Bob

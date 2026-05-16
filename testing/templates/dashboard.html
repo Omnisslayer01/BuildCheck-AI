@@ -97,21 +97,6 @@
                     </div>
                 </div>
 
-                <!-- Business Lens Card -->
-                <div class="bg-slate-800 border-2 border-indigo-500 rounded-lg p-6 shadow-2xl shadow-indigo-500/20">
-                    <div class="text-center">
-                        <h2 class="text-sm text-gray-400 uppercase tracking-wider mb-4">Business Lens (AI Investor Mode)</h2>
-                        <div class="mb-4">
-                            <div class="text-6xl font-bold text-indigo-400">{{ business_lens.score|default:0 }}<span class="text-3xl text-indigo-300">/100</span></div>
-                        </div>
-                        <div class="mt-4 px-4">
-                            <p class="text-sm text-indigo-200 leading-relaxed italic">
-                                "{{ business_lens.verdict|default:'Awaiting AI Business Analysis...' }}"
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- AI Fixes Card -->
                 <div class="bg-slate-800 border-2 border-blue-500 rounded-lg p-6 shadow-xl shadow-blue-500/20">
                     <div class="flex items-center justify-between">
@@ -149,8 +134,17 @@
                 </div>
             </div>
 
-            <!-- Right Column: Bug Tickets -->
-            <div class="lg:col-span-2">
+            <!-- Right Column: Business Lens & Bug Tickets -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Business Lens Card with HTMX Auto-refresh -->
+                <div
+                    hx-get="/api/business-lens-html/"
+                    hx-trigger="load, every 60s"
+                    hx-swap="innerHTML">
+                    {% include "business_lens_card.html" %}
+                </div>
+
+                <!-- Bug Tickets Table -->
                 <div class="bg-slate-800 border-2 border-cyan-500 rounded-lg shadow-2xl shadow-cyan-500/20">
                     <!-- Header -->
                     <div class="bg-slate-950 border-b-2 border-cyan-500 px-6 py-4">
