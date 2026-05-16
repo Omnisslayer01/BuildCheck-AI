@@ -1,0 +1,13 @@
+Ticket ID: 4
+Priority: SEV-1 (Financial Compliance Failure)
+Reported by: VP of Accounting
+
+We just had a catastrophic failure during an IRS compliance audit regarding our automated refund API. 
+
+A customer bought 3 identical T-shirts for $30 total ($10 each). They called support to complain about a shipping delay, so we issued a flat $10 goodwill refund across the order. 
+
+The system correctly calculated that each T-shirt should get a proportional refund of $3.33. However, when our accounting system tallied the ledger, the total refund disbursed was only $9.99 ($3.33 x 3). We literally lost a penny into the void. 
+
+While 1 cent seems small, this happens thousands of times a day, and our books are now off by hundreds of dollars. 
+
+The `verify_total_refund` audit function is failing. The prorated refund function MUST ensure that the sum of `refund_applied` across all items EXACTLY matches the requested `refund_amount`, down to the last cent. You need to handle the remainder properly, usually by applying any leftover pennies to the very last item in the list. Fix this immediately.

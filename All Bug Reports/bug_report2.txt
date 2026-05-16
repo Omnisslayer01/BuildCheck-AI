@@ -1,0 +1,10 @@
+Ticket ID: 2
+Priority: HIGH (Revenue Impacting)
+Reported by: Customer Support Lead
+
+Hey engineering team, we have a massive issue with the WELCOME20 discount code. 
+Customer A bought a $100 item and got the correct 20% off (paid $80). 
+But immediately after, Customer B bought a $200 item using the exact same WELCOME20 code, and the system gave them an $80 discount instead of 20% off! 
+Then Customer C bought a $50 item, and the system gave them an $80 discount, meaning their order was negative/free! 
+
+The percentage discount seems to be breaking and turning into a fixed dollar amount after the first use. Please fix the checkout system ASAP, we are losing money.

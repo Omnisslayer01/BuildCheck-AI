@@ -1,0 +1,11 @@
+Ticket ID: 3
+Priority: CRITICAL (Selling out-of-stock items!)
+Reported by: Warehouse Ops Manager
+
+Guys, we have a massive disaster. We are selling items on the website that we don't actually have in the warehouse! 
+
+Last night, our supplier "TechCorp" sent an automated inventory sync payload. SKU-1002 (Mechanical Keyboard) completely sold out at their facility, so they sent a payload with "stock": 0. 
+
+I looked at our system logs, and it says "[TechCorp] Successfully processed items." No errors! But when I check the website, SKU-1002 STILL says we have 15 in stock! 
+
+Weirdly, when Supplier "OfficeCo" sent an update saying SKU-1003 dropped to 5 in stock, that updated perfectly fine. Why is the system completely ignoring updates ONLY when the stock drops to exactly zero?! Please fix this immediately before we have to refund a hundred angry customers.
