@@ -1,11 +1,10 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 from .models import BugTicket
 
-# Create your views here.
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -64,5 +63,38 @@ def update_bug_status(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+
+
+def dashboard_home(request):
+    """Dashboard home view displaying all bug tickets"""
+    tickets = BugTicket.objects.all()
+    
+    # Calculate stats
+    total_tickets = tickets.count()
+    fixed_tickets = tickets.filter(status='fixed').count()
+    analyzing_tickets = tickets.filter(status='analyzing').count()
+    
+    # Mock stats for demo
+    project_readiness = 85
+    ai_fixes = fixed_tickets
+    threats_blocked = 42
+    
+    context = {
+        'tickets': tickets,
+        'project_readiness': project_readiness,
+        'ai_fixes': ai_fixes,
+        'threats_blocked': threats_blocked,
+    }
+    
+    return render(request, 'dashboard.html', context)
+
+def bug_list_partial(request):
+    """HTMX endpoint for auto-refreshing bug ticket rows"""
+    tickets = BugTicket.objects.all()
+    context = {
+        'tickets': tickets,
+    }
+    return render(request, 'bug_rows.html', context)
 
 # Made with Bob

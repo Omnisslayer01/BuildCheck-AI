@@ -19,7 +19,7 @@ class BugTicket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.title
+        return f"Ticket #{self.id}: {self.title}"
     
     class Meta:
         ordering = ['-created_at']
