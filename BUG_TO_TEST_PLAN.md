@@ -5,7 +5,7 @@
 
 ---
 
-## Step 1: The Bug Tracking Database (Django Models)
+## Step 1: The Bug Tracking Database (Django Models) ❌ NOT COMPLETED
 **Goal:** Create a database table to store the bug reports and their live status so your future web dashboard can display them.
 
 * **Prompt for Bob:**
@@ -23,7 +23,7 @@
 
 ---
 
-## Step 2: The Status Webhook (Django API)
+## Step 2: The Status Webhook (Django API) ❌ NOT COMPLETED
 **Goal:** Create a hidden URL. Later, your Python Sandbox will send a message here to automatically change a bug's status from "failed" to "fixed".
 
 * **Prompt for Bob:**
@@ -41,7 +41,7 @@
 
 ---
 
-## Step 3: The "Dummy App" & Bug Report
+## Step 3: The "Dummy App" & Bug Report ❌ NOT COMPLETED
 **Goal:** Create a broken piece of code and a customer complaint so IBM Bob has something to test and fix during your demo.
 
 * **Manual Step (No Bob needed):**
@@ -69,7 +69,7 @@
 
 ---
 
-## Step 4: The Execution Sandbox
+## Step 4: The Execution Sandbox ❌ NOT COMPLETED
 **Goal:** Create the Python script that will actually run the `pytest` tests that Bob generates.
 
 * **Prompt for Bob:**
@@ -91,14 +91,15 @@
 
 ---
 
-## Step 5: The IBM Bob MCP Server (The Magic Bridge)
+## Step 5: The IBM Bob MCP Server (The Magic Bridge) ✅ COMPLETED
 **Goal:** Connect IBM Bob to your Sandbox so Bob can execute tests by himself.
 
-* **Prompt for Bob:**
-  > "@sandbox.py Create a new file called `mcp_server.py`. 
-  > Using the official Python `mcp` library (`from mcp.server.fastmcp import FastMCP`), initialize an MCP server.
-  > Create an `@mcp.tool()` called `execute_pytest`. This tool should accept a string argument `test_code_string`. Inside the tool, call `sandbox.py`'s `run_generated_test` function, and return the terminal output.
-  > Add the `mcp.run()` command at the bottom so the server can start."
+**Status:** MCP server (`mcp_server.py`) already exists with three tools:
+- `write_file(file_name, content)` - Writes content to filesystem
+- `run_test(file_name)` - Executes pytest on a file via subprocess
+- `report_to_boss(message)` - POSTs to http://localhost:8000/api/report/
+
+**Note:** The implementation differs from the plan - it has `write_file` and `run_test` instead of `execute_pytest`, but achieves the same goal of allowing Bob to execute tests.
 
 * **Test & Validate:**
   1. In the IBM Bob IDE, click the **Settings Icon (gear)**.
@@ -107,22 +108,36 @@
      * Command: `python` (or the absolute path to your venv python, e.g., `C:/.../venv/Scripts/python.exe`)
      * Arguments: `mcp_server.py`
   4. Restart IBM Bob or refresh the MCP connection.
-  5. Open the Bob Chat and ask: *"List your available tools."* Do you see `execute_pytest`? If yes, Success!
+  5. Open the Bob Chat and ask: *"List your available tools."* Do you see the MCP tools? If yes, Success!
   6. *Commit:* `git add . && git commit -m "Step 5: MCP Server Online"`
 
 ---
 
-## Step 6: The Final Demo Run!
+## Step 6: The Final Demo Run! ❌ NOT COMPLETED
 **Goal:** Trigger the automated Bug-to-Test loop. Make sure your MCP server is connected.
 
 * **Prompt for Bob (The ultimate test):**
   > "@bug_report.txt @cart.py Read the bug report. 
   > 1. Write a pytest function to replicate the bug described. 
-  > 2. Use your `execute_pytest` tool to run the test. It should fail.
+  > 2. Use your `run_test` tool to run the test. It should fail.
   > 3. Read the failure output, then fix `cart.py` to resolve the bug.
-  > 4. Use the `execute_pytest` tool a second time to verify your fix works."
+  > 4. Use the `run_test` tool a second time to verify your fix works."
 
 * **Test & Validate:**
   Watch Bob go to work. It should generate the test, run it, see the failure, fix the `add_item` logic in `cart.py`, run it again, and report success.
 
 Once you have written and saved the code, open @PROGRESS.md. Write a heading for this Step, mark it as [COMPLETED], and write a 2-sentence summary of the exact files you modified, the functions you created, and how they solve this step. This will serve as context for our next step
+
+---
+
+## Summary of Completion Status
+
+**Completed Steps:**
+- ✅ **Step 5**: MCP Server exists with `write_file`, `run_test`, and `report_to_boss` tools
+
+**Not Completed Steps:**
+- ❌ **Step 1**: BugTicket model not created (testing/models.py is empty)
+- ❌ **Step 2**: API endpoint not created (testing/views.py is empty)
+- ❌ **Step 3**: cart.py and bug_report.txt files don't exist
+- ❌ **Step 4**: sandbox.py doesn't exist
+- ❌ **Step 6**: Cannot be completed until Steps 1-4 are done

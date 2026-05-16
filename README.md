@@ -12,7 +12,7 @@ BuildCheck AI accelerates software development from ideation to production. It a
 If you are an AI assistant (like IBM Bob) assisting with this codebase, please note the following architectural constraints:
 1. **Role:** You are the core reasoning engine. You will be invoked via the Python MCP Server (`Component B`) to evaluate code, generate tests, and provide patches.
 2. **Execution:** You do *not* run code directly. You write code (tests/fixes) and hand it to the `subprocess` Sandbox (`Component C`), which returns `stdout`/`stderr` back to you.
-3. **State Management:** All state (Bug status, Security events) is managed by Django (`Component A`) and persisted in MySQL.
+3. **State Management:** All state (Bug status, Security events) is managed by Django (`Component A`) and persisted in SQLlite.
 4. **Current Focus:** The primary operational loop is the **Bug-to-Test Execution Loop** defined in Section 4.
 
 ---
@@ -20,7 +20,7 @@ If you are an AI assistant (like IBM Bob) assisting with this codebase, please n
 ## 🛠️ Technology Stack (PMND + AI)
 
 * **Python:** Core language for the backend, testing sandboxes, and MCP Server.
-* **MySQL:** Relational database storing evaluation histories, bug logs, and security events.
+* **sqllite:** Relational database storing evaluation histories, bug logs, and security events.
 * **Nginx:** Web server and reverse proxy handling HTTP/HTTPS routing.
 * **Django:** Backend framework handling business logic, API endpoints, and state management.
 * **HTMX & TailwindCSS:** Frontend UI layer for dynamic, server-side rendered, asynchronous DOM updates.
@@ -68,14 +68,14 @@ A parallel, autonomous background daemon running on the server.
 The heart of BuildCheck AI is its autonomous debugging loop. Here is exactly how a bug is processed:
 
 1. **Ingestion:** User submits a bug report via the Django UI (e.g., *"App crashes on empty cart"*).
-2. **State Initialization:** Django creates a `BugTicket` in MySQL with `status = analyzing`.
+2. **State Initialization:** Django creates a `BugTicket` in SQLlite with `status = analyzing`.
 3. **AI Contextualization:** Django triggers the Python MCP client, handing the bug text and project context to IBM Bob.
 4. **Test Generation:** IBM Bob generates a `pytest` script to reproduce the bug. Django writes this script to the execution sandbox.
 5. **Execution (Validation of Failure):** Component C runs the test via `subprocess`. It captures the expected failure stack trace.
-6. **State Update 1:** MySQL `BugTicket` status updates to `test_failed`. HTMX dynamically updates the UI to show a Red "Test Failing" alert.
+6. **State Update 1:** SQLlite `BugTicket` status updates to `test_failed`. HTMX dynamically updates the UI to show a Red "Test Failing" alert.
 7. **Fix Generation:** Python MCP client sends the captured stack trace back to IBM Bob. Bob generates the code patch.
 8. **Execution (Validation of Fix):** Component C applies the patch and re-runs the test via `subprocess`. The test passes.
-9. **State Update 2:** MySQL `BugTicket` status updates to `fixed`.
+9. **State Update 2:** SQLlite `BugTicket` status updates to `fixed`.
 10. **Resolution Delivery:** HTMX dynamically updates the UI to a Green "Bug Fixed" alert and displays the code diff to the user for final approval.
 
 ---
