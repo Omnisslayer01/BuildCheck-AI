@@ -1,29 +1,28 @@
-# AGENTS.md - Ask Mode Documentation Rules
+# AGENTS.md - Ask Mode Rules
 
 This file provides documentation-specific guidance for agents working in this repository.
 
-## Documentation Mismatches (Non-Obvious)
+## Project Architecture (Non-Obvious)
 
-- **README describes full system** but only skeleton exists (empty models/views in testing app)
-- **BUG_TO_TEST_PLAN.md is the actual roadmap** - shows what's planned vs implemented
+**Critical**: AI agent is invoked via MCP Server - does NOT execute code directly. Tests/fixes are handed to subprocess sandbox which returns stdout/stderr.
 
-## Architecture Context
+## MCP Server Integration
 
-- AI agent is invoked via MCP Server, does NOT execute code directly
-- Subprocess sandbox pattern: AI writes → sandbox executes → returns output
-- Three MCP tools: write_file, run_test, report_to_boss
+MCP server (mcp_server.py) provides three tools that bridge AI reasoning with code execution:
+- `write_file(file_name, content)` - Filesystem writes
+- `run_test(file_name)` - Pytest execution via subprocess
+- `report_to_boss(ticket_id, status)` - Django API updates
 
-## Project State (Important for Questions)
+**Important**: `report_to_boss` signature is `(ticket_id: int, status: str)`, not a generic message parameter.
 
-- testing app: skeleton only (no models, views, or API endpoints yet)
-- BugTicket model: not implemented (planned in BUG_TO_TEST_PLAN.md)
-- Dependencies: no requirements.txt (manual install: pytest, mcp, requests, django)
-- Django dev server must run on port 8000 for MCP report_to_boss tool
+## Testing Framework (Non-Standard)
 
-## Testing Framework
+Uses pytest instead of Django's default unittest. No test discovery - explicit file paths required for subprocess.run(["pytest", file_name]).
 
-Uses pytest (not Django's default unittest) - executed via subprocess, not test discovery.
+## URL Structure (Counterintuitive)
 
-## URL Structure
+testing app URLs mounted at root level (not /testing/ prefix) via `path('', include('testing.urls'))` in BuildCheck_AI/urls.py.
 
-Counterintuitive: testing app URLs included at root level (`path('', include('testing.urls'))`) in BuildCheck_AI/urls.py
+## Environment Configuration
+
+Uses django-environ for SECRET_KEY and DEBUG from .env file (not hardcoded in settings.py).

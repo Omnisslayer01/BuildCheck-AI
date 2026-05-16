@@ -1,33 +1,32 @@
-# AGENTS.md - Plan Mode Architecture Rules
+# AGENTS.md - Plan Mode Rules
 
 This file provides planning-specific guidance for agents working in this repository.
 
-## System Architecture (Non-Obvious Constraints)
+## Architecture Constraints (Non-Obvious)
 
-**Critical**: AI agent is reasoning engine only - does NOT execute code directly. Writes tests/fixes → subprocess sandbox executes → returns stdout/stderr.
+**Critical**: System uses subprocess sandbox pattern - AI agent writes tests/fixes but doesn't execute them directly. MCP server (mcp_server.py) bridges AI reasoning with code execution via subprocess.
 
-## Component Interaction Pattern
+## MCP Server Architecture
 
-- Component A (Django): State management, API endpoints (not yet implemented)
-- Component B (mcp_server.py): MCP bridge with 3 tools (write_file, run_test, report_to_boss)
-- Component C (Subprocess): Execution sandbox for pytest
-- report_to_boss hardcoded to http://localhost:8000/api/report/ (requires Django running)
+Three-tool design pattern:
+- `write_file(file_name, content)` - Filesystem operations
+- `run_test(file_name)` - Pytest execution (not Django unittest)
+- `report_to_boss(ticket_id, status)` - Status updates to Django API
 
-## Database Architecture
-
-Uses SQLite3 (db.sqlite3) as configured in BuildCheck_AI/settings.py.
-
-## Current Implementation State
-
-- testing app: skeleton only (empty models/views)
-- BugTicket model: not implemented yet
-- API endpoints: not created yet
-- BUG_TO_TEST_PLAN.md contains actual roadmap (6 steps)
+**Important**: `report_to_boss` requires structured parameters `(ticket_id: int, status: str)` with hardcoded valid statuses: 'analyzing', 'test_failed', 'fixed' (defined in testing/views.py).
 
 ## Testing Architecture
 
-pytest via subprocess (not Django's unittest) - no test discovery, explicit file paths required.
+Pytest chosen over Django's unittest for subprocess compatibility. No test discovery mechanism - explicit file paths required.
 
-## Dependency Management
+## URL Routing Pattern
 
-No requirements.txt or pyproject.toml - dependencies installed manually: pytest, mcp, requests, django
+testing app URLs mounted at root level (no /testing/ prefix) - counterintuitive but intentional for API simplicity.
+
+## Environment Management
+
+django-environ pattern for SECRET_KEY and DEBUG configuration via .env file (not exposed in settings.py).
+
+## API Integration
+
+Django dev server must run on port 8000 for MCP server's report_to_boss to function. API endpoints use @csrf_exempt for external MCP integration.
