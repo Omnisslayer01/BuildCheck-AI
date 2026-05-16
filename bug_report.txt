@@ -1,0 +1,2 @@
+Customer Issue #992: 
+"If I type -5 into the quantity box, the cart accepts it and subtracts from my total! It should throw a ValueError if the quantity is less than 1."
