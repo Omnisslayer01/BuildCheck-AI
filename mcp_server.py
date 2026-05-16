@@ -51,6 +51,6 @@ def report_to_boss(message: str) -> str:
 
 
 if __name__ == "__main__":
-    mcp.run_stdio()
+    mcp.run()
 
 # Made with Bob
