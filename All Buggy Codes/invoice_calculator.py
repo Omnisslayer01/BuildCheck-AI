@@ -6,7 +6,7 @@ class InvoiceCalculator:
 
     def calculate_prorated_refund(self, order_lines: List[Dict[str, Any]], refund_amount: float) -> List[Dict[str, Any]]:
         """
-        Distributes a flat refund amount across multiple order lines proportionally 
+        Distributes a flat refund amount across multiple order lines proportionally
         based on the line item's price.
         """
         total_order_value = sum(item['price'] * item['quantity'] for item in order_lines)
@@ -30,6 +30,19 @@ class InvoiceCalculator:
                 "refund_applied": prorated_refund,
                 "tax_refunded": round(prorated_refund * self.tax_rate, 2)
             })
+
+        # Fix rounding errors: distribute remainder to last item
+        total_applied = sum(item['refund_applied'] for item in processed_refunds)
+        remainder = round(refund_amount - total_applied, 2)
+        
+        if remainder != 0 and processed_refunds:
+            processed_refunds[-1]['refund_applied'] = round(
+                processed_refunds[-1]['refund_applied'] + remainder, 2
+            )
+            # Recalculate tax for the adjusted item
+            processed_refunds[-1]['tax_refunded'] = round(
+                processed_refunds[-1]['refund_applied'] * self.tax_rate, 2
+            )
 
         return processed_refunds
 

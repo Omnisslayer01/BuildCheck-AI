@@ -87,7 +87,7 @@ def dashboard_home(request):
         'threats_blocked': threats_blocked,
     }
     
-    return render(request, 'dashboard.html', context)
+    return render(request, 'index.html', context)
 
 def bug_list_partial(request):
     """HTMX endpoint for auto-refreshing bug ticket rows"""
