@@ -3,6 +3,8 @@ class ShoppingCart:
         self.items = []
 
     def add_item(self, name, quantity):
+        if quantity < 1:
+            raise ValueError("Quantity must be at least 1")
         self.items.append({"name": name, "qty": quantity})
         return True
 

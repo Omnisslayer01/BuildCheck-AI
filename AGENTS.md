@@ -4,18 +4,16 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Architecture Constraints (Non-Obvious)
 
-**Critical**: You are the AI reasoning engine invoked via MCP Server - you do NOT execute code directly. You write tests/fixes and hand them to the subprocess sandbox which returns stdout/stderr.
-
-## Database Configuration
-
-Uses SQLite3 (db.sqlite3) as configured in BuildCheck_AI/settings.py.
+**Critical**: You are the AI reasoning engine invoked via MCP Server - you do NOT execute code directly. You write tests/fixes and hand them to subprocess sandbox which returns stdout/stderr.
 
 ## MCP Server Tools (mcp_server.py)
 
-Three custom tools available:
+Three custom tools with specific signatures:
 - `write_file(file_name, content)` - Write content to filesystem
-- `run_test(file_name)` - Execute pytest on a file via subprocess
-- `report_to_boss(message)` - POST to http://localhost:8000/api/report/ (hardcoded endpoint)
+- `run_test(file_name)` - Execute pytest via subprocess (not Django's unittest)
+- `report_to_boss(ticket_id, status)` - POST to http://localhost:8000/api/update-status/
+
+**Critical**: `report_to_boss` requires `ticket_id` (int) and `status` (str), not a generic message string. Valid statuses: 'analyzing', 'test_failed', 'fixed' (hardcoded in testing/views.py).
 
 **Important**: Django dev server must be running on port 8000 for report_to_boss to work.
 
@@ -23,20 +21,14 @@ Three custom tools available:
 
 Uses **pytest** (not Django's default unittest). Tests executed via subprocess.run(["pytest", file_name]).
 
-## Dependencies
+**Critical**: No test discovery - explicit file paths required. You must specify the exact test file path.
 
-No requirements.txt or pyproject.toml exists. Manual installation required:
-```bash
-pip install pytest mcp requests django
-```
+## Environment Configuration
 
-## Project State
-
-- testing app has empty models/views (skeleton only)
-- BugTicket model not yet implemented (see BUG_TO_TEST_PLAN.md for roadmap)
-- API endpoints not yet created
-- Secret key exposed in settings.py (development only - change for production)
+Uses django-environ for environment variables. Requires .env file with SECRET_KEY and DEBUG settings (not exposed in settings.py).
 
 ## URL Routing
 
-testing app URLs included at root level via `path('', include('testing.urls'))` in BuildCheck_AI/urls.py
+testing app URLs included at root level via `path('', include('testing.urls'))` in BuildCheck_AI/urls.py (no /testing/ prefix).
+
+API endpoints use @csrf_exempt for MCP integration.

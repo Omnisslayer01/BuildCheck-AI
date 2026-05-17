@@ -5,7 +5,7 @@
 
 ---
 
-## Step 1: The Manager's Dashboard (UI Template)
+## Step 1: The Manager's Dashboard (UI Template) ✅ COMPLETED
 **Goal:** Create a beautiful, dark-mode web page that lists all the bugs currently in the database.
 
 * **Prompt for Bob:**
@@ -24,7 +24,7 @@
 
 ---
 
-## Step 2: Auto-Refreshing the UI (HTMX Magic)
+## Step 2: Auto-Refreshing the UI (HTMX Magic) ✅ COMPLETED
 **Goal:** Make the dashboard automatically update itself every 3 seconds so you don't have to click "Refresh" during your demo.
 
 * **Prompt for Bob:**

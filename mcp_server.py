@@ -34,10 +34,10 @@ def run_test(file_name: str) -> str:
 
 
 @mcp.tool()
-def report_to_boss(message: str) -> str:
-    """Report a message to the boss via API."""
+def report_to_boss(ticket_id: int, status: str) -> str:
+    """Update a bug ticket status through the Django API."""
     try:
-        payload = {"source": "IBM Bob", "message": message}
+        payload = {"ticket_id": ticket_id, "status": status}
         response = requests.post(
             "http://localhost:8000/api/update-status/",
             json=payload
