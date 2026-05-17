@@ -6,6 +6,8 @@ Usage:
     python manage.py update_business_lens --interval 900
 """
 import time
+from datetime import timedelta
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from testing.models import BugTicket, BusinessEvaluation
 
@@ -25,15 +27,26 @@ class Command(BaseCommand):
             default=900,
             help='Interval in seconds between updates (default: 900)',
         )
+    
+    def should_create_evaluation(self):
+        latest = BusinessEvaluation.objects.order_by('-created_at').first()
 
+        if latest is None:
+            return True
+
+        return timezone.now() - latest.created_at >= timedelta(minutes=15)
+    
     def handle(self, *args, **options):
         once = options['once']
         interval = options['interval']
 
         if once:
-            self.stdout.write(self.style.SUCCESS('Creating single Business Lens evaluation...'))
-            self.create_evaluation()
-            self.stdout.write(self.style.SUCCESS('[OK] Evaluation created successfully'))
+            if self.should_create_evaluation():
+                self.stdout.write(self.style.SUCCESS('Creating single Business Lens evaluation...'))
+                self.create_evaluation()
+                self.stdout.write(self.style.SUCCESS('[OK] Evaluation created successfully'))
+            else:
+                self.stdout.write(self.style.WARNING('[SKIP] Latest evaluation is still fresh'))
         else:
             self.stdout.write(self.style.SUCCESS(
                 f'Starting Business Lens auto-update (interval: {interval}s)'
@@ -42,10 +55,16 @@ class Command(BaseCommand):
             
             try:
                 while True:
-                    self.create_evaluation()
-                    self.stdout.write(self.style.SUCCESS(
-                        f'[OK] Evaluation created. Next update in {interval}s...'
+                    if self.should_create_evaluation():
+                        self.create_evaluation()
+                        self.stdout.write(self.style.SUCCESS(
+                        f'[OK] Evaluation created. Next check in {interval}s...'
+                        ))
+                    else:
+                        self.stdout.write(self.style.WARNING(
+                        f'[SKIP] Latest evaluation is still fresh. Next check in {interval}s...'
                     ))
+
                     time.sleep(interval)
             except KeyboardInterrupt:
                 self.stdout.write(self.style.WARNING('\nStopping Business Lens auto-update'))
