@@ -49,6 +49,23 @@ def report_to_boss(ticket_id: int, status: str) -> str:
     except Exception as e:
         return f"Error reporting to boss: {str(e)}"
 
+@mcp.tool()
+def submit_business_lens(score: int, verdict: str) -> str:
+    """IBM Bob uses this to send a Business & Monetization Evaluation to the Dashboard."""
+    try:
+        payload = {
+            "score": score,
+            "verdict": verdict
+        }
+        response = requests.post("http://localhost:8000/api/business-lens/", json=payload)
+        if response.status_code == 200:
+            return "Business evaluation successfully sent to the Dashboard!"
+        else:
+            return f"Error: Status {response.status_code}"
+    except Exception as e:
+        return f"Failed to send business evaluation: {str(e)}"
+
+
 if __name__ == "__main__":
     mcp.run()
 

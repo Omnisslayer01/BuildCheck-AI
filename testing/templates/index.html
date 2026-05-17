@@ -134,8 +134,17 @@
                 </div>
             </div>
 
-            <!-- Right Column: Bug Tickets -->
-            <div class="lg:col-span-2">
+            <!-- Right Column: Business Lens & Bug Tickets -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Business Lens Card with HTMX Auto-refresh -->
+                <div
+                    hx-get="/api/business-lens-html/"
+                    hx-trigger="load, every 60s"
+                    hx-swap="innerHTML">
+                    {% include "business_lens_card.html" %}
+                </div>
+
+                <!-- Bug Tickets Table -->
                 <div class="bg-slate-800 border-2 border-cyan-500 rounded-lg shadow-2xl shadow-cyan-500/20">
                     <!-- Header -->
                     <div class="bg-slate-950 border-b-2 border-cyan-500 px-6 py-4">
@@ -162,7 +171,7 @@
                             </thead>
                             <tbody class="divide-y divide-slate-700"
                                    hx-get="/api/bug-list-html/"
-                                   hx-trigger="every 5s"
+                                   hx-trigger="every 3s"
                                    hx-swap="innerHTML">
                                 {% include 'bug_rows.html' %}
                             </tbody>
