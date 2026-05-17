@@ -34,7 +34,7 @@ class Command(BaseCommand):
         if latest is None:
             return True
 
-        return timezone.now() - latest.created_at >= timedelta(minutes=15)
+        return timezone.now() - latest.created_at >= timedelta(minutes=1)
     
     def handle(self, *args, **options):
         once = options['once']
