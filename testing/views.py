@@ -70,8 +70,9 @@ def update_bug_status(request):
 @require_http_methods(["POST"])
 def api_business_lens(request):
     """
-    API endpoint to save business evaluation data.
+    API endpoint to save business evaluation data from IBM Bob's AI.
     Expects JSON: {"score": 85, "verdict": "Good business potential"}
+    The score is 100% controlled by IBM Bob's AI evaluation.
     """
     try:
         data = json.loads(request.body)
@@ -108,9 +109,10 @@ def api_business_lens(request):
                 'error': 'Verdict must be non-empty text'
             }, status=400)
         
-        # Create new BusinessEvaluation object
+        # Create new BusinessEvaluation with AI-provided score
         evaluation = BusinessEvaluation.objects.create(
             score=score,
+            ai_base_score=score,
             verdict=verdict.strip()
         )
         

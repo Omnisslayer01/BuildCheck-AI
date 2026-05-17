@@ -28,6 +28,7 @@ class BugTicket(models.Model):
 class BusinessEvaluation(models.Model):
     id = models.BigAutoField(primary_key=True)
     score = models.IntegerField()
+    ai_base_score = models.IntegerField(null=True, blank=True)
     verdict = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     

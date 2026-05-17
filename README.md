@@ -31,10 +31,18 @@ If you are an AI assistant (like IBM Bob) assisting with this codebase, please n
 
 ## 📦 Core Modules
 
-### 1. 📈 Venture Check (Business Viability)
-Acts as an AI product strategist. 
-* **Inputs:** App name, problem statement, target users, proposed solution, monetization strategy, competitors.
-* **Outputs:** Problem/user clarity scores, market urgency, differentiation, execution risk, and MVP improvement suggestions.
+### 1. The Dual-Lens Evaluator (VC + CTO Mode)
+Developers often build features without validating if the business logic is sound or if the code is production-ready. BuildCheck AI solves this by acting as an autonomous Product Strategist and Enterprise CTO.
+
+**How to test this feature:**
+We have included a `demo_startup/` folder with sample code (or you can use your own code! Just paste your entire project folder into the 'demo_startup' folder after removing the existing files).
+
+1. Ensure the Django server is running (`python manage.py runserver`) and the Dashboard is open.
+2. Open IBM Bob in your IDE.
+3. Type `@evaluate.md Execute this` to load our Master Prompt, and press Enter to execute.
+
+**What happens:**
+IBM Bob will analyze the startup's product-market fit and technical debt simultaneously. It will invoke our custom MCP Server tool (`submit_business_lens`) to send a secure Webhook to the Django backend. You will see the purple "Business Lens" card on the web dashboard instantly update with an AI-generated Viability Score and Executive Summary.
 
 ### 2. 🚢 Ship Check (Technical Readiness)
 Acts as an AI Senior Software Engineer.
